@@ -1,0 +1,41 @@
+{% extends 'mini2/base.html' %}
+
+{% block content %}
+
+<h2>Monthly Summary</h2>
+
+<h3 class="income">
+    Total Income : ₹ {{ total_income }}
+</h3>
+
+<h3 class="expense">
+    Total Expense : ₹ {{ total_expense }}
+</h3>
+
+<h3>
+    Net Balance : ₹ {{ net_balance }}
+</h3>
+
+<hr>
+
+<h2>Expense By Category</h2>
+
+<table>
+
+    <tr>
+        <th>Category</th>
+        <th>Total Spent</th>
+    </tr>
+
+    {% for item in category_breakdown %}
+
+    <tr>
+        <td>{{ item.category__name }}</td>
+        <td>₹ {{ item.total_spent }}</td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}
