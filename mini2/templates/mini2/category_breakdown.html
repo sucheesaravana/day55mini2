@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Category Breakdown</title>
+</head>
+<body>
+
+<h1>Expense Breakdown By Category</h1>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>Category</th>
+        <th>Total Expense</th>
+    </tr>
+
+    {% for item in categories %}
+
+    <tr>
+        <td>{{ item.category__name }}</td>
+        <td>₹ {{ item.total_spent }}</td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+<br>
+
+<a href="/">
+    Back to Dashboard
+</a>
+
+</body>
+</html>

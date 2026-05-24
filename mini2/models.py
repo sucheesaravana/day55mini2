@@ -10,23 +10,20 @@ class Category(models.Model):
 
 class Transaction(models.Model):
 
-    TRANSACTION_CHOICES = [
+    TRANSACTION_TYPES = (
         ('Income', 'Income'),
         ('Expense', 'Expense'),
-    ]
+    )
 
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
-        related_name='transactions'
+        on_delete=models.CASCADE
     )
 
     transaction_type = models.CharField(
         max_length=10,
-        choices=TRANSACTION_CHOICES
+        choices=TRANSACTION_TYPES
     )
-
-    date = models.DateField()
 
     amount = models.DecimalField(
         max_digits=10,
@@ -34,6 +31,8 @@ class Transaction(models.Model):
     )
 
     description = models.TextField()
+
+    date = models.DateField()
 
     def __str__(self):
         return f"{self.transaction_type} - {self.amount}"

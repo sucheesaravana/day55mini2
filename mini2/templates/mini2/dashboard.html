@@ -1,41 +1,57 @@
-{% extends 'mini2/base.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
 
-{% block content %}
+<h1>Personal Finance Dashboard</h1>
 
-<h2>Monthly Summary</h2>
+<h2>Total Income: ₹ {{ total_income }}</h2>
 
-<h3 class="income">
-    Total Income : ₹ {{ total_income }}
-</h3>
+<h2>Total Expense: ₹ {{ total_expense }}</h2>
 
-<h3 class="expense">
-    Total Expense : ₹ {{ total_expense }}
-</h3>
-
-<h3>
-    Net Balance : ₹ {{ net_balance }}
-</h3>
+<h2>Net Balance: ₹ {{ net_balance }}</h2>
 
 <hr>
 
-<h2>Expense By Category</h2>
+<a href="/add/">
+    Add Transaction
+</a>
 
-<table>
+<br><br>
+
+<a href="/category-breakdown/">
+    Category Breakdown
+</a>
+
+<hr>
+
+<h2>All Transactions</h2>
+
+<table border="1" cellpadding="10">
 
     <tr>
+        <th>Date</th>
         <th>Category</th>
-        <th>Total Spent</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Description</th>
     </tr>
 
-    {% for item in category_breakdown %}
+    {% for transaction in transactions %}
 
     <tr>
-        <td>{{ item.category__name }}</td>
-        <td>₹ {{ item.total_spent }}</td>
+        <td>{{ transaction.date }}</td>
+        <td>{{ transaction.category.name }}</td>
+        <td>{{ transaction.transaction_type }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.description }}</td>
     </tr>
 
     {% endfor %}
 
 </table>
 
-{% endblock %}
+</body>
+</html>

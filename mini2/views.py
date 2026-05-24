@@ -1,123 +1,80 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
-from django.utils.timezone import now
+from django.utils import timezone
 
 from .models import Transaction
 from .forms import TransactionForm
 
 
-# Dashboard View
-def dashboard(request):
-
-    current_month = now().month
-    current_year = now().year
-
-    # Monthly Income
-    total_income = Transaction.objects.filter(
-        transaction_type='Income',
-        date__month=current_month,
-        date__year=current_year
-    ).aggregate(
-        total=Sum('amount')
-    )['total'] or 0
-
-    # Monthly Expense
-    total_expense = Transaction.objects.filter(
-        transaction_type='Expense',
-        date__month=current_month,
-        date__year=current_year
-    ).aggregate(
-        total=Sum('amount')
-    )['total'] or 0
-
-    # Net Balance
-    net_balance = total_income - total_expense
-
-    # Category Breakdown
-    category_breakdown = (
-        Transaction.objects
-        .filter(transaction_type='Expense')
-        .values('category__name')
-        .annotate(total_spent=Sum('amount'))
-        .order_by('-total_spent')
-    )
-
-    context = {
-        'total_income': total_income,
-        'total_expense': total_expense,
-        'net_balance': net_balance,
-        'category_breakdown': category_breakdown,
-    }
-
-    return render(request, 'mini2/dashboard.html', context)
-
-
-# List Transactions
-def transaction_list(request):
-
-    transactions = Transaction.objects.all().order_by('-date')
-
-    return render(
-        request,
-        'mini2/transaction_list.html',
-        {'transactions': transactions}
-    )
-
-
-# Create Transaction
-def transaction_create(request):
+def add_transaction(request):
 
     if request.method == 'POST':
         form = TransactionForm(request.POST)
 
         if form.is_valid():
             form.save()
-            return redirect('transaction_list')
+            return redirect('dashboard')
 
     else:
         form = TransactionForm()
 
     return render(
         request,
-        'mini2/transaction_form.html',
+        'mini2/add_transaction.html',
         {'form': form}
     )
 
 
-# Update Transaction
-def transaction_update(request, pk):
+def dashboard(request):
 
-    transaction = get_object_or_404(Transaction, pk=pk)
+    current_month = timezone.now().month
+    current_year = timezone.now().year
 
-    if request.method == 'POST':
-        form = TransactionForm(request.POST, instance=transaction)
+    income = Transaction.objects.filter(
+        transaction_type='Income',
+        date__month=current_month,
+        date__year=current_year
+    ).aggregate(total=Sum('amount'))
 
-        if form.is_valid():
-            form.save()
-            return redirect('transaction_list')
+    expense = Transaction.objects.filter(
+        transaction_type='Expense',
+        date__month=current_month,
+        date__year=current_year
+    ).aggregate(total=Sum('amount'))
 
-    else:
-        form = TransactionForm(instance=transaction)
+    total_income = income['total'] or 0
+    total_expense = expense['total'] or 0
+
+    net_balance = total_income - total_expense
+
+    transactions = Transaction.objects.all()
+
+    context = {
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'net_balance': net_balance,
+        'transactions': transactions,
+    }
 
     return render(
         request,
-        'mini2/transaction_form.html',
-        {'form': form}
+        'mini2/dashboard.html',
+        context
     )
 
 
-# Delete Transaction
-def transaction_delete(request, pk):
+def category_breakdown(request):
 
-    transaction = get_object_or_404(Transaction, pk=pk)
-
-    if request.method == 'POST':
-        transaction.delete()
-        return redirect('transaction_list')
+    categories = (
+        Transaction.objects
+        .filter(transaction_type='Expense')
+        .values('category__name')
+        .annotate(total_spent=Sum('amount'))
+    )
 
     return render(
         request,
-        'mini2/transaction_delete.html',
-        {'transaction': transaction}
+        'mini2/category_breakdown.html',
+        {'categories': categories}
     )

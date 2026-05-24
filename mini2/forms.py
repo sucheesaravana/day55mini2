@@ -6,15 +6,4 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-
-        fields = [
-            'transaction_type',
-            'category',
-            'date',
-            'amount',
-            'description'
-        ]
-
-        widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-        }
+        fields = '__all__'
